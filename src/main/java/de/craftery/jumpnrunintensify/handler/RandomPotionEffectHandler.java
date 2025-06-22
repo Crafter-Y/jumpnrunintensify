@@ -11,61 +11,68 @@ import com.sk89q.worldguard.session.handler.FlagValueChangeHandler;
 import com.sk89q.worldguard.session.handler.Handler;
 import de.craftery.jumpnrunintensify.Jumpnrunintensify;
 import org.bukkit.Bukkit;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-public class SoundFlagHandler extends FlagValueChangeHandler<StateFlag.State> {
+public class RandomPotionEffectHandler extends FlagValueChangeHandler<StateFlag.State> {
     private static final Random random = new Random();
 
-    private static final List<Sound> SCARY_SOUNDS = Arrays.asList(
-            Sound.AMBIENT_CAVE,
-            Sound.ENTITY_GHAST_SCREAM,
-            Sound.MUSIC_DISC_11,
-            Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR,
-            Sound.ENTITY_WITHER_SPAWN,
-            Sound.ENTITY_LIGHTNING_BOLT_THUNDER,
-            Sound.ENTITY_EVOKER_PREPARE_SUMMON,
-            Sound.ENTITY_RAVAGER_ROAR,
-            Sound.ENTITY_WARDEN_ROAR,
-            Sound.ENTITY_GHAST_WARN
+    private static final List<EffectConfig> SCARY_EFFECTS = Arrays.asList(
+            new EffectConfig(PotionEffectType.BLINDNESS, 3, 1),
+            new EffectConfig(PotionEffectType.NAUSEA, 7, 1),
+            new EffectConfig(PotionEffectType.SLOWNESS, 3, 2),
+            new EffectConfig(PotionEffectType.POISON, 3, 1),
+            new EffectConfig(PotionEffectType.WITHER, 3, 1)
     );
 
-
-    protected SoundFlagHandler(Session session) {
-        super(session, Jumpnrunintensify.SOUND_FLAG);
+    protected RandomPotionEffectHandler(Session session) {
+        super(session, Jumpnrunintensify.RANDOM_POTION_FLAG);
     }
 
-    public static final Factory FACTORY = new Factory();
-    public static class Factory extends Handler.Factory<SoundFlagHandler> {
+    public static final RandomPotionEffectHandler.Factory FACTORY = new RandomPotionEffectHandler.Factory();
+    public static class Factory extends Handler.Factory<RandomPotionEffectHandler> {
         @Override
-        public SoundFlagHandler create(Session session) {
-            return new SoundFlagHandler(session);
+        public RandomPotionEffectHandler create(Session session) {
+            return new RandomPotionEffectHandler(session);
         }
     }
 
     @Override
     public boolean onCrossBoundary(LocalPlayer player, Location from, Location to, ApplicableRegionSet toSet, Set<ProtectedRegion> entered, Set<ProtectedRegion> exited, MoveType moveType) {
         for (ProtectedRegion region : entered) {
-            StateFlag.State flagValue = region.getFlag(Jumpnrunintensify.SOUND_FLAG);
+            StateFlag.State flagValue = region.getFlag(Jumpnrunintensify.RANDOM_POTION_FLAG);
 
             if (flagValue == StateFlag.State.ALLOW) {
                 Player bukkitPlayer = Bukkit.getPlayer(player.getUniqueId());
                 if (bukkitPlayer != null) {
-                    int randomIndex = random.nextInt(SCARY_SOUNDS.size());
-                    Sound soundToPlay = SCARY_SOUNDS.get(randomIndex);
+                    int randomIndex = random.nextInt(SCARY_EFFECTS.size());
+                    EffectConfig chosenEffect = SCARY_EFFECTS.get(randomIndex);
 
-                    bukkitPlayer.playSound(bukkitPlayer.getLocation(), soundToPlay, 1f, 1.5f);
+                    int durationTicks = chosenEffect.durationSeconds * 20;
+
+                    PotionEffect potionEffect = new PotionEffect(
+                            chosenEffect.type,
+                            durationTicks,
+                            chosenEffect.amplifier,
+                            false, // ambient
+                            false  // icon
+                    );
+
+                    bukkitPlayer.addPotionEffect(potionEffect);
                 }
             }
         }
 
         return true;
     }
+
+    private record EffectConfig (PotionEffectType type, int durationSeconds, int amplifier) {}
 
     @Override
     protected void onInitialValue(LocalPlayer player, ApplicableRegionSet set, StateFlag.State value) {}
