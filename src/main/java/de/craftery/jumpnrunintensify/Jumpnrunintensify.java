@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 
 
 public final class Jumpnrunintensify extends JavaPlugin {
-    public static final Logger LOGGER = LoggerFactory.getLogger("craftinghomes");
+    public static final Logger LOGGER = LoggerFactory.getLogger("jumpnrunintensify");
 
     public static StateFlag SOUND_FLAG;
     public static StateFlag RANDOM_POTION_FLAG;
@@ -31,6 +31,8 @@ public final class Jumpnrunintensify extends JavaPlugin {
 
         SOUND_FLAG = registerFlag("jnr-sound-effect");
         RANDOM_POTION_FLAG = registerFlag("jnr-random-potion");
+
+        // currently still unimplemented
         BLINDNESS_FLAG = registerFlag("jnr-blindness");
         SLOWNESS_FLAG = registerFlag("jnr-slowness");
         FREEZE_FLAG = registerFlag("jnr-freeze");
@@ -56,8 +58,6 @@ public final class Jumpnrunintensify extends JavaPlugin {
             registry.register(flag);
             return flag;
         } catch (FlagConflictException e) {
-            // some other plugin registered a flag by the same name already.
-            // you can use the existing flag, but this may cause conflicts - be sure to check type
             Flag<?> existing = registry.get(name);
             if (existing instanceof StateFlag) {
                 return (StateFlag) existing;
@@ -70,6 +70,6 @@ public final class Jumpnrunintensify extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
+        LOGGER.info("Shutting down");
     }
 }
