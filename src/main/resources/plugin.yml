@@ -1,0 +1,6 @@
+name: jumpnrunintensify
+version: '0.1'
+main: de.craftery.jumpnrunintensify.Jumpnrunintensify
+api-version: '1.21'
+authors: [ Crafter-Y ]
+website: https://github.com/Crafter-Y/ChestShopManager
