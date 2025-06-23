@@ -10,7 +10,7 @@ Custom flags are used to determine if an effect should be applied for a given re
 
 ## Dependencies
 
-- Bukkit/Paper 1.20.5
+- Bukkit/Paper 1.21.5
 - [WorldGuard](https://enginehub.org/worldguard)
 - [WorldEdit](https://enginehub.org/worldedit)
 
